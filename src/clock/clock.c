@@ -433,6 +433,8 @@ static lv_obj_t *create_alarm_item(lv_obj_t *parent, alarm_info_t *alarm_info, u
     lv_obj_t *switch_label = lv_label_create(switch_btn);
     lv_obj_set_style_text_color(switch_label, lv_color_white(), 0);
     lv_obj_set_style_text_font(switch_label, font18.font, 0);
+    // 修改开关状态指示器部分，打开状态时的背景颜色
+    lv_obj_set_style_bg_color(switch_btn, lv_color_hex(0x000000), LV_PART_INDICATOR | LV_STATE_CHECKED);
 
     if (alarm_info->is_enabled)
     {
