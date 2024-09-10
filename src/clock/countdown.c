@@ -57,14 +57,20 @@ void countdown_page_init(char *minutes_str)
 
     // 添加开始计时按钮
     start_timer_btn = create_clock_public_btn(scr);
+    lv_obj_set_layout(start_timer_btn, LV_LAYOUT_FLEX);                                                       // 设置 flex 布局
+    lv_obj_set_flex_flow(start_timer_btn, LV_FLEX_FLOW_ROW);                                                  // 设置为行布局
+    lv_obj_set_flex_align(start_timer_btn, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // 设置对齐方式（居中）
+
     lv_obj_t *btn_icon = lv_img_create(start_timer_btn);
     lv_img_set_src(btn_icon, "I:/data/images/start_timer.png"); // 设置PNG图像的路径
-    lv_obj_align(btn_icon, LV_ALIGN_LEFT_MID, 10, 0);
+    lv_obj_set_style_pad_right(btn_icon, 10, 0);
+    lv_obj_set_style_pad_left(btn_icon, -5, 0);
+    // lv_obj_align(btn_icon, LV_ALIGN_LEFT_MID, 10, 0);
 
     lv_obj_t *start_label = lv_label_create(start_timer_btn);
     lv_label_set_text(start_label, "开始计时");
     lv_obj_set_style_text_font(start_label, font22.font, 0);
-    lv_obj_center(start_label);
+    // lv_obj_center(start_label);
 
     // 标题
     lv_obj_t *titel_label = lv_label_create(scr);
@@ -75,15 +81,15 @@ void countdown_page_init(char *minutes_str)
     lv_obj_set_style_text_font(titel_label, font22.font, 0);
 
     // 创建外部圆弧（作为边框）
-    lv_obj_t *outer_arc = lv_arc_create(scr);
-    lv_obj_set_size(outer_arc, 320, 320);  // 外圆弧比内圆弧稍大
-    lv_arc_set_bg_angles(outer_arc, 0, 0); // 背景圆弧
-    lv_arc_set_angles(outer_arc, 0, 360);
-    lv_obj_set_style_arc_color(outer_arc, lv_color_black(), LV_PART_INDICATOR); // 设置外圆弧颜色为黑色
-    lv_obj_set_style_arc_width(outer_arc, 1, LV_PART_INDICATOR);                // 设置边框宽度
-    lv_obj_center(outer_arc);
-    lv_obj_remove_style(outer_arc, NULL, LV_PART_KNOB);  // 移除默认的指示器样式
-    lv_obj_clear_flag(outer_arc, LV_OBJ_FLAG_CLICKABLE); // 移除点击事件
+    // lv_obj_t *outer_arc = lv_arc_create(scr);
+    // lv_obj_set_size(outer_arc, 320, 320);  // 外圆弧比内圆弧稍大
+    // lv_arc_set_bg_angles(outer_arc, 0, 0); // 背景圆弧
+    // lv_arc_set_angles(outer_arc, 0, 360);
+    // lv_obj_set_style_arc_color(outer_arc, lv_color_black(), LV_PART_INDICATOR); // 设置外圆弧颜色为黑色
+    // lv_obj_set_style_arc_width(outer_arc, 1, LV_PART_INDICATOR);                // 设置边框宽度
+    // lv_obj_center(outer_arc);
+    // lv_obj_remove_style(outer_arc, NULL, LV_PART_KNOB);  // 移除默认的指示器样式
+    // lv_obj_clear_flag(outer_arc, LV_OBJ_FLAG_CLICKABLE); // 移除点击事件
 
     // 创建圆弧倒计时动画
     arc = lv_arc_create(scr);
@@ -99,15 +105,15 @@ void countdown_page_init(char *minutes_str)
     lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);                        // 移除点击事件
 
     // 创建内部圆弧（作为内边框）
-    lv_obj_t *in_arc = lv_arc_create(scr);
-    lv_obj_set_size(in_arc, 274, 274);
-    lv_arc_set_bg_angles(in_arc, 0, 0); // 背景圆弧
-    lv_arc_set_angles(in_arc, 0, 360);
-    lv_obj_set_style_arc_color(in_arc, lv_color_black(), LV_PART_INDICATOR); // 设置外圆弧颜色为黑色
-    lv_obj_set_style_arc_width(in_arc, 1, LV_PART_INDICATOR);                // 设置边框宽度
-    lv_obj_center(in_arc);
-    lv_obj_remove_style(in_arc, NULL, LV_PART_KNOB);  // 移除默认的指示器样式
-    lv_obj_clear_flag(in_arc, LV_OBJ_FLAG_CLICKABLE); // 移除点击事件
+    // lv_obj_t *in_arc = lv_arc_create(scr);
+    // lv_obj_set_size(in_arc, 274, 274);
+    // lv_arc_set_bg_angles(in_arc, 0, 0); // 背景圆弧
+    // lv_arc_set_angles(in_arc, 0, 360);
+    // lv_obj_set_style_arc_color(in_arc, lv_color_black(), LV_PART_INDICATOR); // 设置外圆弧颜色为黑色
+    // lv_obj_set_style_arc_width(in_arc, 1, LV_PART_INDICATOR);                // 设置边框宽度
+    // lv_obj_center(in_arc);
+    // lv_obj_remove_style(in_arc, NULL, LV_PART_KNOB);  // 移除默认的指示器样式
+    // lv_obj_clear_flag(in_arc, LV_OBJ_FLAG_CLICKABLE); // 移除点击事件
 
     // 创建圆弧内部倒计时标签
     countdown_label = lv_label_create(scr);
@@ -128,7 +134,7 @@ void countdown_page_init(char *minutes_str)
 // 返回按钮点击事件
 static void click_back_btn_cb(lv_event_t *e)
 {
-    if (timer)
+    if (timer && remaining_time > 0)
     {
         printf("lv_timer_del(timer);\n");
         lv_timer_del(timer);
@@ -161,6 +167,7 @@ static void pause_btn_event_cb(lv_event_t *e)
 {
     lv_obj_t *btn = lv_event_get_target(e);
     lv_label_set_text(lv_obj_get_child(btn, 1), "继续");
+    lv_img_set_src(lv_obj_get_child(btn, 0), "I:/data/images/start_timer.png"); // 设置PNG图像的路径
     lv_obj_remove_event_cb_with_user_data(btn, pause_btn_event_cb, NULL);
     lv_obj_add_event_cb(btn, continue_btn_event_cb, LV_EVENT_CLICKED, NULL);
 
@@ -174,6 +181,7 @@ static void continue_btn_event_cb(lv_event_t *e)
     printf("continue_btn_event_cb-----------\n");
     lv_obj_t *btn = lv_event_get_target(e);
     lv_label_set_text(lv_obj_get_child(btn, 1), "暂停");
+    lv_img_set_src(lv_obj_get_child(btn, 0), "I:/data/images/pause.png"); // 设置PNG图像的路径
     lv_obj_remove_event_cb_with_user_data(btn, continue_btn_event_cb, NULL);
     lv_obj_add_event_cb(btn, pause_btn_event_cb, LV_EVENT_CLICKED, NULL);
 
@@ -189,6 +197,7 @@ static void countdown_timer_cb()
     {
         lv_timer_del(timer);
         lv_label_set_text(lv_obj_get_child(start_timer_btn, 1), "重新计时");
+        lv_img_set_src(lv_obj_get_child(start_timer_btn, 0), "I:/data/images/refresh.png"); // 设置PNG图像的路径
         // lv_obj_remove_event_cb_with_user_data(start_timer_btn, start_btn_event_cb, NULL);
         lv_obj_remove_event_cb_with_user_data(start_timer_btn, pause_btn_event_cb, NULL);
         lv_obj_add_event_cb(start_timer_btn, start_btn_event_cb, LV_EVENT_CLICKED, NULL);

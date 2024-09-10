@@ -563,32 +563,25 @@ static void create_timer_btn(lv_obj_t *parent, char *btn_text, lv_coord_t x, lv_
     lv_obj_set_style_bg_color(btn, lv_color_white(), 0);     // 设置背景颜色为白色
     lv_obj_set_style_border_color(btn, lv_color_black(), 0); // 设置边框颜色为黑色
     lv_obj_set_style_border_width(btn, 2, 0);                // 设置边框宽度
+    lv_obj_set_layout(btn, LV_LAYOUT_FLEX);                  // 使用Flex布局
+    lv_obj_set_flex_flow(btn, LV_FLEX_FLOW_COLUMN);          // 垂直布局
+    lv_obj_set_flex_align(btn, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-    // 3. 创建一个容器用于放置两个标签
-    lv_obj_t *container = lv_obj_create(btn);                     // 在按钮内创建一个容器
-    lv_obj_set_size(container, LV_SIZE_CONTENT, LV_SIZE_CONTENT); // 容器大小自动适应内容
-    lv_obj_center(container);                                     // 容器居中对齐
-    lv_obj_set_style_border_width(container, 0, 0);
-    lv_obj_add_flag(container, LV_OBJ_FLAG_EVENT_BUBBLE); // 允许事件冒泡
-
-    lv_obj_set_layout(container, LV_LAYOUT_FLEX);         // 使用Flex布局
-    lv_obj_set_flex_flow(container, LV_FLEX_FLOW_COLUMN); // 垂直布局
-    lv_obj_set_flex_align(container, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    // 4. 添加自定义文本
-    lv_obj_t *label1 = lv_label_create(container); // 在容器内创建第一个标签
-    lv_label_set_text(label1, btn_text);           // 设置标签1的文本
+    // 3. 添加自定义文本
+    lv_obj_t *label1 = lv_label_create(btn); // 在容器内创建第一个标签
+    lv_label_set_text(label1, btn_text);     // 设置标签1的文本
     lv_obj_set_style_text_color(label1, lv_color_black(), 0);
     lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_set_style_text_font(label1, font18.font, 0);
+    lv_obj_set_style_text_font(label1, font30.font, 0);
 
     // 5. 如果文本不是 "自定义"，再添加 "min" 文本
     if (strcmp(btn_text, "自定义") != 0)
     {
-        lv_obj_t *label2 = lv_label_create(container); // 在容器内创建第二个标签
-        lv_label_set_text(label2, "min");              // 设置标签2的文本
+        lv_obj_t *label2 = lv_label_create(btn); // 在容器内创建第二个标签
+        lv_label_set_text(label2, "min");        // 设置标签2的文本
         lv_obj_set_style_text_color(label2, lv_color_black(), 0);
         lv_obj_set_style_text_align(label2, LV_TEXT_ALIGN_CENTER, 0);
+        lv_obj_set_style_text_font(label2, font18.font, 0);
     }
 
     lv_obj_add_event_cb(btn, click_timer_btn_cb, LV_EVENT_CLICKED, btn_text);
