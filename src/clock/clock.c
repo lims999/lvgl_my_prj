@@ -576,7 +576,7 @@ static void create_timer_btn(lv_obj_t *parent, char *btn_text, lv_coord_t x, lv_
     lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_text_font(label1, font30.font, 0);
 
-    // 5. 如果文本不是 "自定义"，再添加 "min" 文本
+    // 4. 如果文本不是 "自定义"，再添加 "min" 文本
     if (strcmp(btn_text, "自定义") != 0)
     {
         lv_obj_t *label2 = lv_label_create(btn); // 在容器内创建第二个标签
