@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "countdown.h"
+#include "custom_countdown.h"
 
 /*********************
  *      DEFINES
@@ -63,13 +63,13 @@ void custom_countdown_page_init(void)
     lv_obj_center(start_label);
 
     // 新建倒计时 时 - 按钮
-    lv_obj_t *h_minus_btn = create_btn_img(scr, "I:/data/images/minus_btn.png");
+    lv_obj_t *h_minus_btn = create_btn_img(scr, "A:/data/images/minus_btn.png");
     lv_obj_set_pos(h_minus_btn, 130, 212);
     lv_obj_set_style_bg_color(h_minus_btn, lv_color_white(), 0);
     lv_obj_set_style_shadow_opa(h_minus_btn, 0, 0);
 
     // 新建倒计时 分 - 按钮
-    lv_obj_t *m_minus_btn = create_btn_img(scr, "I:/data/images/minus_btn.png");
+    lv_obj_t *m_minus_btn = create_btn_img(scr, "A:/data/images/minus_btn.png");
     lv_obj_set_pos(m_minus_btn, 291, 212);
     lv_obj_set_style_bg_color(m_minus_btn, lv_color_white(), 0);
     lv_obj_set_style_shadow_opa(m_minus_btn, 0, 0);
@@ -95,13 +95,13 @@ void custom_countdown_page_init(void)
     lv_obj_set_style_text_font(m_unit, font18.font, 0);
 
     // 新建倒计时 时 + 按钮
-    lv_obj_t *h_add_btn = create_btn_img(scr, "I:/data/images/add_btn.png");
+    lv_obj_t *h_add_btn = create_btn_img(scr, "A:/data/images/add_btn.png");
     lv_obj_set_pos(h_add_btn, 130, 432);
     lv_obj_set_style_bg_color(h_add_btn, lv_color_white(), 0);
     lv_obj_set_style_shadow_opa(h_add_btn, 0, 0);
 
     // 新建倒计时 分 + 按钮
-    lv_obj_t *m_add_btn = create_btn_img(scr, "I:/data/images/add_btn.png");
+    lv_obj_t *m_add_btn = create_btn_img(scr, "A:/data/images/add_btn.png");
     lv_obj_set_pos(m_add_btn, 291, 432);
     lv_obj_set_style_bg_color(m_add_btn, lv_color_white(), 0);
     lv_obj_set_style_shadow_opa(m_add_btn, 0, 0);

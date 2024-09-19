@@ -24,7 +24,8 @@ extern "C"         // extern "C" 是一个 C++ 的特性，用于告诉 C++ 编�
 #include "src/clock/countdown.h"        // 倒计时
 #include "src/clock/custom_countdown.h" // 自定义倒计时
 
-#include "src/ai_assistant/chat.h" // AI 助手
+#include "src/ai_assistant/chat.h"        // AI 助手
+#include "src/ai_assistant/msg_details.h" // 消息详情
 
 /*********************
  *      DEFINES

@@ -136,7 +136,7 @@ lv_obj_t *clock_base_page_init(void)
 // 创建返回按钮
 lv_obj_t *create_back_btn(lv_obj_t *parent)
 {
-    lv_obj_t *back_btn = create_btn_img(parent, "I:/data/images/back_btn.png");
+    lv_obj_t *back_btn = create_btn_img(parent, "A:/data/images/back_btn.png");
     lv_obj_set_pos(back_btn, 0, 716);
     lv_obj_set_style_bg_color(back_btn, lv_color_white(), 0);
     lv_obj_set_style_pad_all(back_btn, 20, LV_STATE_DEFAULT);
@@ -153,7 +153,7 @@ void create_time_manage(void)
     lv_obj_t *back_btn = create_back_btn(scr);
 
     // 右下角新增闹钟按钮
-    lv_obj_t *add_clock_btn = create_btn_img(scr, "I:/data/images/add_btn.png");
+    lv_obj_t *add_clock_btn = create_btn_img(scr, "A:/data/images/add_btn.png");
     lv_obj_set_pos(add_clock_btn, 400, 722);
 
     // 时间管理主要内容

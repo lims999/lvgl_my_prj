@@ -62,7 +62,7 @@ void countdown_page_init(char *minutes_str)
     lv_obj_set_flex_align(start_timer_btn, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // 设置对齐方式（居中）
 
     lv_obj_t *btn_icon = lv_img_create(start_timer_btn);
-    lv_img_set_src(btn_icon, "I:/data/images/start_timer.png"); // 设置PNG图像的路径
+    lv_img_set_src(btn_icon, "A:/data/images/start_timer.png"); // 设置PNG图像的路径
     lv_obj_set_style_pad_right(btn_icon, 10, 0);
     lv_obj_set_style_pad_left(btn_icon, -5, 0);
     // lv_obj_align(btn_icon, LV_ALIGN_LEFT_MID, 10, 0);
@@ -154,7 +154,7 @@ static void start_btn_event_cb(lv_event_t *e)
     printf("start_btn_event_cb%d--%d\n", remaining_time, total_time);
     lv_obj_t *btn = lv_event_get_target(e);
     lv_label_set_text(lv_obj_get_child(btn, 1), "暂停");
-    lv_img_set_src(lv_obj_get_child(btn, 0), "I:/data/images/pause.png"); // 设置PNG图像的路径
+    lv_img_set_src(lv_obj_get_child(btn, 0), "A:/data/images/pause.png"); // 设置PNG图像的路径
     lv_obj_remove_event_cb_with_user_data(btn, start_btn_event_cb, NULL);
     lv_obj_add_event_cb(btn, pause_btn_event_cb, LV_EVENT_CLICKED, NULL);
 
@@ -167,7 +167,7 @@ static void pause_btn_event_cb(lv_event_t *e)
 {
     lv_obj_t *btn = lv_event_get_target(e);
     lv_label_set_text(lv_obj_get_child(btn, 1), "继续");
-    lv_img_set_src(lv_obj_get_child(btn, 0), "I:/data/images/start_timer.png"); // 设置PNG图像的路径
+    lv_img_set_src(lv_obj_get_child(btn, 0), "A:/data/images/start_timer.png"); // 设置PNG图像的路径
     lv_obj_remove_event_cb_with_user_data(btn, pause_btn_event_cb, NULL);
     lv_obj_add_event_cb(btn, continue_btn_event_cb, LV_EVENT_CLICKED, NULL);
 
@@ -181,7 +181,7 @@ static void continue_btn_event_cb(lv_event_t *e)
     printf("continue_btn_event_cb-----------\n");
     lv_obj_t *btn = lv_event_get_target(e);
     lv_label_set_text(lv_obj_get_child(btn, 1), "暂停");
-    lv_img_set_src(lv_obj_get_child(btn, 0), "I:/data/images/pause.png"); // 设置PNG图像的路径
+    lv_img_set_src(lv_obj_get_child(btn, 0), "A:/data/images/pause.png"); // 设置PNG图像的路径
     lv_obj_remove_event_cb_with_user_data(btn, continue_btn_event_cb, NULL);
     lv_obj_add_event_cb(btn, pause_btn_event_cb, LV_EVENT_CLICKED, NULL);
 
@@ -197,7 +197,7 @@ static void countdown_timer_cb()
     {
         lv_timer_del(timer);
         lv_label_set_text(lv_obj_get_child(start_timer_btn, 1), "重新计时");
-        lv_img_set_src(lv_obj_get_child(start_timer_btn, 0), "I:/data/images/refresh.png"); // 设置PNG图像的路径
+        lv_img_set_src(lv_obj_get_child(start_timer_btn, 0), "A:/data/images/refresh.png"); // 设置PNG图像的路径
         // lv_obj_remove_event_cb_with_user_data(start_timer_btn, start_btn_event_cb, NULL);
         lv_obj_remove_event_cb_with_user_data(start_timer_btn, pause_btn_event_cb, NULL);
         lv_obj_add_event_cb(start_timer_btn, start_btn_event_cb, LV_EVENT_CLICKED, NULL);

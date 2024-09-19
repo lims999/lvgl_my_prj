@@ -25,13 +25,14 @@ typedef struct
     sender_type_t sender; // 消息发送者（用户或AI）
     char *text;           // 文本内容（文本消息或AI回复）
     char *voice_path;     // 语音文件路径（用户语音或AI语音）
+    char *schedule;       // 日程内容（可选）
 } chat_msg_t;
 
 // 定义一个聊天列表数组
 chat_msg_t chat_list[MAX_MESSAGES] = {
     {SENDER_AI, "你好，我是AI助手，请问有什么可以帮到你？", "xxx.mp3"},
     {SENDER_USER, NULL, "xxx.mp3"},
-    {SENDER_AI, "你好，我是AI助手，请问有什么可以帮到你？", "xxx.mp3"},
+    {SENDER_AI, "你好，我是AI助手，请问有什么可以帮到你？", "xxx.mp3", "6月23日 星期六 09:20-12:00"},
     {SENDER_USER, NULL, "xxx.mp3"},
     {SENDER_AI, "你好，我是AI助手，请问有什么可以帮到你？", "xxx.mp3"},
     {SENDER_AI, "你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？", "xxx.mp3"},
@@ -99,7 +100,7 @@ void toast_init()
 
     // 创建一个icon
     lv_obj_t *icon = lv_img_create(toast);
-    lv_img_set_src(icon, "I:/data/images/AI/failed.png");
+    lv_img_set_src(icon, "A:/data/images/AI/failed.png");
 
     // 创建一个文本标签
     lv_obj_t *label = lv_label_create(toast);
@@ -149,11 +150,11 @@ void *create_chat_page(void)
     lv_obj_t *speech_btn = create_clock_public_btn(scr);
     lv_obj_set_width(speech_btn, 272);
     lv_obj_t *mic_icon = lv_img_create(speech_btn);
-    lv_img_set_src(mic_icon, "I:/data/images/AI/mic_icon.png");
+    lv_img_set_src(mic_icon, "A:/data/images/AI/mic_icon.png");
     lv_obj_center(mic_icon);
 
     // 静音按钮
-    lv_obj_t *mute_btn = create_btn_img(scr, "I:/data/images/AI/voiced.png");
+    lv_obj_t *mute_btn = create_btn_img(scr, "A:/data/images/AI/voiced.png");
     lv_obj_align(mute_btn, LV_ALIGN_BOTTOM_RIGHT, -20, -20);
 
     // 聊天内容容器
@@ -195,7 +196,7 @@ void *create_chat_page(void)
 
     // 提示 icon
     lv_obj_t *topTipIcon = lv_img_create(topTip);
-    lv_img_set_src(topTipIcon, "I:/data/images/AI/tip_icon.png");
+    lv_img_set_src(topTipIcon, "A:/data/images/AI/tip_icon.png");
 
     // 提示文字
     lv_obj_t *topTipText = lv_label_create(topTip);
@@ -253,7 +254,7 @@ void *create_chat_page(void)
 
     // 模态框内部控件
     lv_obj_t *mic_tip_icon = lv_img_create(mic_modal);
-    lv_img_set_src(mic_tip_icon, "I:/data/images/AI/mic_icon_big.png");
+    lv_img_set_src(mic_tip_icon, "A:/data/images/AI/mic_icon_big.png");
     lv_obj_t *mic_tip_text = lv_label_create(mic_modal);
     lv_obj_set_style_text_color(mic_tip_text, lv_color_hex(0x000000), 0);
     lv_obj_set_style_text_font(mic_tip_text, font22.font, 0);
@@ -320,12 +321,12 @@ static void click_mute_btn_cb(lv_event_t *e)
     // 使用 strstr 判断是 "voiced" / "mute"
     if (strstr(lv_img_get_src(lv_obj_get_child(btn, 0)), "voiced") != NULL)
     {
-        lv_img_set_src(lv_obj_get_child(btn, 0), "I:/data/images/AI/mute.png");
+        lv_img_set_src(lv_obj_get_child(btn, 0), "A:/data/images/AI/mute.png");
         // TODO: 关闭音量
     }
     else
     {
-        lv_img_set_src(lv_obj_get_child(btn, 0), "I:/data/images/AI/voiced.png");
+        lv_img_set_src(lv_obj_get_child(btn, 0), "A:/data/images/AI/voiced.png");
         // TODO: 打开音量
     }
 }
@@ -373,6 +374,7 @@ static void click_view_all_btn_cb(lv_event_t *e)
 {
     printf("click_view_all_btn_cb.\n");
     // TODO: 查看完整内容
+    create_msg_details();
 }
 
 // 初始化聊天内容列表
@@ -428,7 +430,7 @@ static void update_chat_list_ui(void)
 
             // 用户发送的消息（语音）
             // lv_label_set_text(msg_text, chat_list[i].text);
-            lv_obj_t *voice_msg_btn = create_btn_img(msg_container, "I:/data/images/AI/voice_msg.png");
+            lv_obj_t *voice_msg_btn = create_btn_img(msg_container, "A:/data/images/AI/voice_msg.png");
 
             lv_obj_add_event_cb(voice_msg_btn, click_play_btn_cb, LV_EVENT_CLICKED, NULL); // 添加播放按钮事件
         }
@@ -443,7 +445,6 @@ static void update_chat_list_ui(void)
             lv_obj_set_style_radius(msg_container, 20, 0);
             lv_obj_set_layout(msg_container, LV_LAYOUT_FLEX);         // 使用Flex布局
             lv_obj_set_flex_flow(msg_container, LV_FLEX_FLOW_COLUMN); // 垂直布局
-            // lv_obj_set_flex_align(msg_container, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // 将内容右对齐
 
             // 创建聊天消息文本
             lv_obj_t *msg_text = lv_label_create(msg_container);
@@ -458,32 +459,56 @@ static void update_chat_list_ui(void)
             // AI 回复的消息（语音 + 文本 + 操作选项）
             lv_label_set_text(msg_text, chat_list[i].text); // 显示 AI 回复的文本内容
 
-            if (i != 0)
+            if (i != 0) // 不是第一条 AI 的消息，才显示操作按钮
             {
                 // 操作按钮
                 lv_obj_t *msg_btns_box = lv_obj_create(msg_container);
                 lv_obj_set_size(msg_btns_box, LV_PCT(100), LV_SIZE_CONTENT);
-                lv_obj_set_layout(msg_btns_box, LV_LAYOUT_FLEX);                                                              // 使用Flex布局
-                lv_obj_set_flex_flow(msg_btns_box, LV_FLEX_FLOW_ROW);                                                         // 水平布局
-                lv_obj_set_flex_align(msg_btns_box, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // space-between
+                lv_obj_set_layout(msg_btns_box, LV_LAYOUT_FLEX);      // 使用Flex布局
+                lv_obj_set_flex_flow(msg_btns_box, LV_FLEX_FLOW_ROW); // 水平布局
+
                 lv_obj_set_style_pad_all(msg_btns_box, 0, 0);
+                lv_obj_set_style_pad_top(msg_btns_box, 10, 0);
 
                 lv_obj_set_style_border_side(msg_btns_box, LV_BORDER_SIDE_TOP, 0); // 只显示上边框
-                lv_obj_set_style_border_width(msg_btns_box, 1, 0);                 // 调试
+                lv_obj_set_style_border_width(msg_btns_box, 1, 0);
                 lv_obj_set_style_border_color(msg_btns_box, lv_color_hex(0x000000), 0);
-                // 播放按钮
-                lv_obj_t *play_btn = create_btn_img(msg_btns_box, "I:/data/images/AI/play_icon.png");
-                // lv_obj_set_size(play_btn, 48, 48);
 
-                // 添加至知识库按钮
-                lv_obj_t *add_to_knowledge_btn = create_btn_img(msg_btns_box, "I:/data/images/AI/add_to_knowledge.png");
+                if (chat_list[i].schedule) // 有日程信息
+                {
+                    lv_obj_t *image = lv_img_create(msg_btns_box);
+                    lv_img_set_src(image, "A:/data/images/AI/schedule_icon.png");
+                    lv_obj_set_style_border_width(image, 1, 0); // 调试
+                    lv_obj_set_style_border_color(image, lv_color_hex(0x000000), 0);
 
-                // 查看完整内容按钮
-                lv_obj_t *view_all_btn = create_btn_img(msg_btns_box, "I:/data/images/AI/view_all_icon.png");
+                    // 日程文本
+                    lv_obj_t *schedule_text = lv_label_create(msg_btns_box);
+                    // lv_obj_set_size(schedule_text, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+                    lv_obj_set_style_text_font(schedule_text, font18.font, 0);
 
-                lv_obj_add_event_cb(play_btn, click_play_btn_cb, LV_EVENT_CLICKED, NULL);                  // 添加播放按钮事件
-                lv_obj_add_event_cb(add_to_knowledge_btn, click_knowledge_btn_cb, LV_EVENT_CLICKED, NULL); // 添加知识库按钮事件
-                lv_obj_add_event_cb(view_all_btn, click_view_all_btn_cb, LV_EVENT_CLICKED, NULL);          // 添加查看完整内容按钮事件
+                    lv_obj_set_style_border_width(schedule_text, 1, 0); // 调试
+                    lv_obj_set_style_border_color(schedule_text, lv_color_hex(0xff0000), 0);
+
+                    // 设置日程文本
+                    lv_label_set_text(schedule_text, chat_list[i].schedule);
+                }
+                else
+                {
+                    lv_obj_set_flex_align(msg_btns_box, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // 为按钮时使用 space-between
+                    // 播放按钮
+                    lv_obj_t *play_btn = create_btn_img(msg_btns_box, "A:/data/images/AI/play_icon.png");
+                    // lv_obj_set_size(play_btn, 48, 48);
+
+                    // 添加至知识库按钮
+                    lv_obj_t *add_to_knowledge_btn = create_btn_img(msg_btns_box, "A:/data/images/AI/add_to_knowledge.png");
+
+                    // 查看完整内容按钮
+                    lv_obj_t *view_all_btn = create_btn_img(msg_btns_box, "A:/data/images/AI/view_all_icon.png");
+
+                    lv_obj_add_event_cb(play_btn, click_play_btn_cb, LV_EVENT_CLICKED, NULL);                  // 添加播放按钮事件
+                    lv_obj_add_event_cb(add_to_knowledge_btn, click_knowledge_btn_cb, LV_EVENT_CLICKED, NULL); // 添加知识库按钮事件
+                    lv_obj_add_event_cb(view_all_btn, click_view_all_btn_cb, LV_EVENT_CLICKED, NULL);          // 添加查看完整内容按钮事件
+                }
             }
         }
     }
