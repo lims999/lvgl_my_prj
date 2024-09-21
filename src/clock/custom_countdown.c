@@ -36,7 +36,8 @@ static void start_btn_cb(lv_event_t *e);      // 启动计时按钮点击事件
 // 自定义倒计时页面
 void custom_countdown_page_init(void)
 {
-    // basic_page_init("自定义计时");              // 状态栏
+    // lvgl_page_basic_t *title = lvgl_page_basic_init(scr);
+    // lvgl_page_basic_set_text(title, "自定义计时"); // 设置标题
     lv_obj_t *scr = clock_base_page_init(); // 自定义倒计时 基础页面
 
     // 添加返回按钮
@@ -78,21 +79,21 @@ void custom_countdown_page_init(void)
     lv_obj_t *h_text = lv_label_create(scr);
     lv_label_set_text(h_text, hour);
     lv_obj_set_pos(h_text, 126, 322);
-    lv_obj_set_style_text_font(h_text, font18.font, 0);
+    lv_obj_set_style_text_font(h_text, font60.font, 0);
     lv_obj_t *h_unit = lv_label_create(scr);
     lv_label_set_text(h_unit, "时");
     lv_obj_set_pos(h_unit, 199, 353);
-    lv_obj_set_style_text_font(h_unit, font18.font, 0);
+    lv_obj_set_style_text_font(h_unit, font22.font, 0);
 
     // 新建倒计时 分 - 文本
     lv_obj_t *m_text = lv_label_create(scr);
     lv_label_set_text(m_text, minute);
     lv_obj_set_pos(m_text, 286, 322);
-    lv_obj_set_style_text_font(m_text, font18.font, 0);
+    lv_obj_set_style_text_font(m_text, font60.font, 0);
     lv_obj_t *m_unit = lv_label_create(scr);
     lv_label_set_text(m_unit, "分");
     lv_obj_set_pos(m_unit, 359, 353);
-    lv_obj_set_style_text_font(m_unit, font18.font, 0);
+    lv_obj_set_style_text_font(h_unit, font22.font, 0);
 
     // 新建倒计时 时 + 按钮
     lv_obj_t *h_add_btn = create_btn_img(scr, "A:/data/images/add_btn.png");
@@ -143,6 +144,11 @@ static void start_btn_cb(lv_event_t *e)
     alarm_add_data_t *timer_data = (alarm_add_data_t *)lv_event_get_user_data(e);
 
     int minutes = timer_data->alarm_info->minute + timer_data->alarm_info->hour * 60;
+    if (minutes <= 0)
+    {
+        // 倒计时时间小于等于0
+        return;
+    }
     // 定义一个足够大的字符数组来存储结果
     char minutes_str[10];
     snprintf(minutes_str, sizeof(minutes_str), "%d", minutes);

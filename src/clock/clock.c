@@ -147,7 +147,8 @@ lv_obj_t *create_back_btn(lv_obj_t *parent)
 // 时间管理页面
 void create_time_manage(void)
 {
-    // basic_page_init("时间管理");              // 状态栏
+    // lvgl_page_basic_t *title = lvgl_page_basic_init(scr);
+    // lvgl_page_basic_set_text(title, "时间管理"); // 设置标题
     lv_obj_t *scr = clock_base_page_init(); // clock 基础页面
     // 添加返回按钮
     lv_obj_t *back_btn = create_back_btn(scr);

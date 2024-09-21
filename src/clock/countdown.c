@@ -50,7 +50,9 @@ void countdown_page_init(char *minutes_str)
     int minutes = atoi(minutes_str); // 将传入的字符串转换为整数
     total_time = minutes * 60;       // 设置总时间
     remaining_time = total_time;     // 初始化剩余时间
-    // basic_page_init("倒计时");              // 状态栏
+
+    // lvgl_page_basic_t *title = lvgl_page_basic_init(scr);
+    // lvgl_page_basic_set_text(title, "倒计时"); // 设置标题
     lv_obj_t *scr = clock_base_page_init(); // 倒计时 基础页面
     // 添加返回按钮
     lv_obj_t *back_btn = create_back_btn(scr);

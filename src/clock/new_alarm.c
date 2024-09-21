@@ -97,7 +97,8 @@ void m_minus_btn_cb(lv_event_t *e)
 // 新建闹钟页面
 void create_new_alarm_page()
 {
-    // basic_page_init("新建闹钟");              // 状态栏
+    // lvgl_page_basic_t *title = lvgl_page_basic_init(scr);
+    // lvgl_page_basic_set_text(title, "新建闹钟"); // 设置标题
     lv_obj_t *scr = clock_base_page_init(); // clock 基础页面
     // 添加返回按钮
     lv_obj_t *back_btn = create_back_btn(scr);

@@ -141,7 +141,8 @@ void toast_hide(void)
 // 创建ai助手聊天页面
 void *create_chat_page(void)
 {
-    // basic_page_init("AI 助手");              // 状态栏
+    // lvgl_page_basic_t *title = lvgl_page_basic_init(scr);
+    // lvgl_page_basic_set_text(title, "AI 助手"); // 设置标题
     lv_obj_t *scr = clock_base_page_init(); // clock 基础页面
     // 添加返回按钮
     lv_obj_t *back_btn = create_back_btn(scr);
