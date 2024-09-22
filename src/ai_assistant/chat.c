@@ -22,24 +22,26 @@ typedef enum
 // 消息结构体
 typedef struct
 {
-    sender_type_t sender; // 消息发送者（用户或AI）
-    char *text;           // 文本内容（文本消息或AI回复）
-    char *voice_path;     // 语音文件路径（用户语音或AI语音）
-    char *schedule;       // 日程内容（可选）
+    sender_type_t sender;  // 消息发送者（用户或AI）
+    char *detail_time;     // 记录时间（可选）
+    char *text;            // 文本内容（文本消息或AI回复）
+    char *voice_path;      // 语音文件路径（用户语音或AI语音）
+    char *detail_duration; // 消息时长（可选）
+    char *schedule;        // 日程内容（可选）
 } chat_msg_t;
 
 // 定义一个聊天列表数组
 chat_msg_t chat_list[MAX_MESSAGES] = {
-    {SENDER_AI, "你好，我是AI助手，请问有什么可以帮到你？", "xxx.mp3"},
-    {SENDER_USER, NULL, "xxx.mp3"},
-    {SENDER_AI, "你好，我是AI助手，请问有什么可以帮到你？", "xxx.mp3", "6月23日 星期六 09:20-12:00"},
-    {SENDER_USER, NULL, "xxx.mp3"},
-    {SENDER_AI, "你好，我是AI助手，请问有什么可以帮到你？", "xxx.mp3"},
-    {SENDER_AI, "你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？", "xxx.mp3"},
-    {SENDER_AI, "你好，我是AI助手，请问有什么可以帮到你？", "xxx.mp3"},
-    {SENDER_AI, "你好，我是AI助手，请问有什么可以帮到你？", "xxx.mp3"},
-    {SENDER_AI, "你好，我是AI助手，请问有什么可以帮到你？", "xxx.mp3"},
-    {SENDER_AI, "你好，我是AI助手，请问有什么可以帮到你？", "xxx.mp3"},
+    {SENDER_AI, "2024-07-21 10:04", "你好，我是AI助手，请问有什么可以帮到你？", "xxx1.mp3", "00:01"},
+    {SENDER_USER, NULL, NULL, "xxx2.mp3", "00:05", NULL},
+    {SENDER_AI, "2024-07-22 11:04", "你好，我是AI助手，请问有什么可以帮到你？", "xxx3.mp3", "00:03", "6月23日 星期六 09:20-12:00"},
+    {SENDER_USER, NULL, NULL, "xxx4.mp3", "00:06", NULL},
+    {SENDER_AI, "2024-07-23 11:04", "你好，我是AI助手，请问有什么可以帮到你？", "xxx5.mp3", "00:03"},
+    {SENDER_AI, "2024-08-22 7:04", "你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？你好，我是AI助手，请问有什么可以帮到你？", "xxx6.mp3", "00:13"},
+    {SENDER_AI, "2024-08-24 6:04", "你好，我是AI助手，请问有什么可以帮到你？", "xxx7.mp3", "00:03"},
+    {SENDER_AI, "2024-07-14 12:04", "你好，我是AI助手，请问有什么可以帮到你？", "xxx8.mp3", "00:03"},
+    {SENDER_AI, "2024-07-16 21:04", "你好，我是AI助手，请问有什么可以帮到你？", "xxx9.mp3", "00:03"},
+    {SENDER_AI, "2024-07-30 14:04", "你好，我是AI助手，请问有什么可以帮到你？", "xxx10.mp3", "00:03"},
 };
 int chat_count = 10; // 记录聊天消息的数量
 
@@ -50,12 +52,11 @@ static void click_back_btn_cb(lv_event_t *e);                                   
 static void click_speech_btn_cb(lv_event_t *e);                                      // 语音输入按钮长按事件
 static void click_mute_btn_cb(lv_event_t *e);                                        // 静音按钮点击事件
 static void click_tip_btn_cb(lv_event_t *e);                                         // 联网、绑定按钮点击事件
-static void click_play_btn_cb(lv_event_t *e);                                        // 点击 播放语音消息 按钮
-static void click_knowledge_btn_cb(lv_event_t *e);                                   // 点击 添加至知识库 按钮
 static void click_view_all_btn_cb(lv_event_t *e);                                    // 点击 查看完整内容 按钮
 static void add_msg(sender_type_t sender, const char *text, const char *voice_path); // 添加消息
 static void update_chat_list_ui(void);                                               // 更新聊天列表
 static void init_chat_ui(void);                                                      // 初始化聊天内容列表
+static void create_msg_detail(lv_obj_t *scr);                                        // 展示消息详情
 
 void toast_init(); // 初始化 toast
 void toast_show(); // 显示 toast
@@ -66,6 +67,10 @@ void toast_hide(); // 隐藏 toast
  **********************/
 static lv_obj_t *chat_container = NULL; // 聊天列表容器（全局定义用于后续更新）
 static lv_obj_t *mic_modal = NULL;      // 语音输入时模态框
+
+lv_obj_t *detail_box = NULL;      // 详情页容器
+chat_msg_t *chat_msg_item = NULL; // 当前消息对象
+char *voice_path = NULL;          // 当前详情语音文件路径（通过传参方式使用会导致多个event触发）
 
 /**********************
  *      MACROS
@@ -78,6 +83,7 @@ bool is_online = false;         // 是否联网
 bool is_bind = false;           // 是否绑定
 lv_obj_t *toast = NULL;         // toast 对象 配合 toast_init() toast_show() toast_hide() 使用
 lv_timer_t *toast_timer = NULL; // toast 显示定时器 配合 toast_init() toast_show() toast_hide() 使用
+
 // 初始化 Toast
 void toast_init()
 {
@@ -261,6 +267,8 @@ void *create_chat_page(void)
     lv_obj_set_style_text_font(mic_tip_text, font22.font, 0);
     lv_label_set_text(mic_tip_text, "我在听...");
 
+    create_msg_detail(scr); // 创建消息详情界面（默认隐藏）
+
     init_chat_ui(); // 添加初始聊天界面消息（AI助手欢迎词）
     toast_init();   // 初始化 Toast 最后调用确保 Toast 在最上层显示
 
@@ -351,14 +359,23 @@ static void click_tip_btn_cb(lv_event_t *e)
 }
 
 // 点击 播放语音消息 按钮
-static void click_play_btn_cb(lv_event_t *e)
+void click_play_btn_cb(lv_event_t *e)
 {
-    printf("click play.\n");
+    char *path = lv_event_get_user_data(e); // 获取添加事件时传递的用户数据
+    if (path == NULL)
+    {
+        printf("path11: %s\n", voice_path);
+    }
+    else
+    {
+        printf("path22: %s\n", path);
+    }
+
     // TODO: 播放语音消息
 }
 
 // 点击 添加至知识库 按钮
-static void click_knowledge_btn_cb(lv_event_t *e)
+void click_knowledge_btn_cb(lv_event_t *e)
 {
     if (!is_bind)
     {
@@ -374,8 +391,29 @@ static void click_knowledge_btn_cb(lv_event_t *e)
 static void click_view_all_btn_cb(lv_event_t *e)
 {
     printf("click_view_all_btn_cb.\n");
+    chat_msg_t *msg = (chat_msg_t *)lv_event_get_user_data(e);
+
+    // 更新记录时间
+    lv_obj_t *detail_title = lv_obj_get_child(detail_box, 0);
+    lv_obj_t *time_text = lv_obj_get_child(detail_title, 0);
+    lv_obj_t *time_val_text = lv_obj_get_child(time_text, 0);
+    lv_label_set_text(time_val_text, msg->detail_time); // "2024-07-21 10:04"
+
+    // 更新时长
+    lv_obj_t *duration_text = lv_obj_get_child(detail_title, 1); // duration
+    lv_obj_t *duration_val_text = lv_obj_get_child(duration_text, 0);
+    lv_label_set_text(duration_val_text, msg->detail_duration);
+
+    // 更新内容
+    lv_obj_t *detail_container = lv_obj_get_child(detail_box, 1); // detail
+    lv_obj_t *detail_content_text = lv_obj_get_child(detail_container, 1);
+    lv_label_set_text(detail_content_text, msg->text);
+
+    // 更新 播放语音消息 对应 path
+    voice_path = msg->voice_path;
+
     // TODO: 查看完整内容
-    create_msg_details();
+    lv_obj_clear_flag(detail_box, LV_OBJ_FLAG_HIDDEN); // 显示详情页
 }
 
 // 初始化聊天内容列表
@@ -433,7 +471,7 @@ static void update_chat_list_ui(void)
             // lv_label_set_text(msg_text, chat_list[i].text);
             lv_obj_t *voice_msg_btn = create_btn_img(msg_container, "A:/data/images/AI/voice_msg.png");
 
-            lv_obj_add_event_cb(voice_msg_btn, click_play_btn_cb, LV_EVENT_CLICKED, NULL); // 添加播放按钮事件
+            lv_obj_add_event_cb(voice_msg_btn, click_play_btn_cb, LV_EVENT_CLICKED, chat_list[i].voice_path); // 添加播放按钮事件
         }
         else if (chat_list[i].sender == SENDER_AI)
         {
@@ -506,11 +544,146 @@ static void update_chat_list_ui(void)
                     // 查看完整内容按钮
                     lv_obj_t *view_all_btn = create_btn_img(msg_btns_box, "A:/data/images/AI/view_all_icon.png");
 
-                    lv_obj_add_event_cb(play_btn, click_play_btn_cb, LV_EVENT_CLICKED, NULL);                  // 添加播放按钮事件
-                    lv_obj_add_event_cb(add_to_knowledge_btn, click_knowledge_btn_cb, LV_EVENT_CLICKED, NULL); // 添加知识库按钮事件
-                    lv_obj_add_event_cb(view_all_btn, click_view_all_btn_cb, LV_EVENT_CLICKED, NULL);          // 添加查看完整内容按钮事件
+                    // chat_msg_item = &chat_list[i];
+
+                    lv_obj_add_event_cb(play_btn, click_play_btn_cb, LV_EVENT_CLICKED, chat_list[i].voice_path); // 添加播放按钮事件
+                    lv_obj_add_event_cb(add_to_knowledge_btn, click_knowledge_btn_cb, LV_EVENT_CLICKED, NULL);   // 添加知识库按钮事件
+                    lv_obj_add_event_cb(view_all_btn, click_view_all_btn_cb, LV_EVENT_CLICKED, &chat_list[i]);   // 添加查看完整内容按钮事件
                 }
             }
         }
     }
+}
+
+/********************************************************************** 消息详情相关 **********************************************************************/
+// 返回按钮点击事件
+static void click_detail_back_btn_cb(lv_event_t *e)
+{
+    lv_obj_add_flag(detail_box, LV_OBJ_FLAG_HIDDEN); // 隐藏消息详情页
+}
+// 展示消息详情
+static void create_msg_detail(lv_obj_t *scr)
+{
+    // 创建一个对象用于表示矩形（背景容器）
+    detail_box = lv_obj_create(scr);
+    lv_obj_set_style_pad_all(detail_box, 0, 0);
+    lv_obj_add_flag(detail_box, LV_OBJ_FLAG_HIDDEN); // 默认隐藏消息详情页
+
+    // 设置矩形的宽度为屏幕宽度，高度从y=20到屏幕底部
+    lv_coord_t screen_width = lv_obj_get_width(scr);
+    lv_coord_t screen_height = lv_obj_get_height(scr);
+
+    // 设置矩形的大小和位置（往下移动遮住下边圆角）
+    lv_obj_set_size(detail_box, screen_width, screen_height - 20);
+    lv_obj_set_pos(detail_box, 0, 76); // 从y=20开始
+
+    // 设置矩形的样式
+    lv_obj_set_style_radius(detail_box, 40, 0);                 // 圆角半径
+    lv_obj_set_style_bg_color(detail_box, lv_color_white(), 0); // 背景色白色
+    lv_obj_set_style_bg_opa(detail_box, LV_OPA_COVER, 0);       // 不透明
+
+    // 禁用滚动条
+    lv_obj_set_scrollbar_mode(scr, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_scrollbar_mode(detail_box, LV_SCROLLBAR_MODE_OFF);
+
+    // 禁用滚动
+    lv_obj_set_scroll_dir(scr, LV_DIR_NONE);
+    lv_obj_set_scroll_dir(detail_box, LV_DIR_NONE);
+
+    /* 中间内容部分 */
+    lv_obj_t *detail_title = lv_obj_create(detail_box);
+    lv_obj_remove_style_all(detail_title);
+    lv_obj_set_size(detail_title, 480, 74);
+    lv_obj_set_pos(detail_title, -2, -2);
+    lv_obj_set_style_border_width(detail_title, 1, 0);
+    lv_obj_set_style_border_color(detail_title, lv_color_hex(0x000000), 0);
+    lv_obj_set_layout(detail_title, LV_LAYOUT_FLEX); // 使用Flex布局
+    lv_obj_set_flex_align(detail_title, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_all(detail_title, 20, 0);
+
+    lv_obj_t *time_text = lv_label_create(detail_title);
+    lv_obj_set_size(time_text, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_style_text_font(time_text, font18.font, 0);
+    lv_label_set_text(time_text, "记录时间");
+
+    // TODO: 设置字体加粗
+    lv_obj_t *time_val_text = lv_label_create(time_text);
+    lv_obj_set_size(time_val_text, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_style_text_font(time_val_text, font18.font, 0);
+    lv_label_set_text(time_val_text, ""); // "2024-07-21 10:04"
+    lv_obj_set_pos(time_val_text, 78, 0);
+
+    lv_obj_t *duration_text = lv_label_create(detail_title);
+    lv_obj_set_size(duration_text, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_style_text_font(duration_text, font18.font, 0);
+    lv_label_set_text(duration_text, "时长");
+
+    lv_obj_t *duration_val_text = lv_label_create(duration_text);
+    lv_obj_set_size(duration_val_text, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_style_text_font(duration_val_text, font18.font, 0);
+    lv_label_set_text(duration_val_text, "00:00"); // "13:23"
+    lv_obj_set_pos(duration_val_text, 38, 0);
+
+    // 详情内容容器
+    lv_obj_t *detail_container = lv_obj_create(detail_box);
+    lv_obj_remove_style_all(detail_container);
+    lv_obj_set_size(detail_container, LV_PCT(100), 548);
+    lv_obj_set_pos(detail_container, 0, 72);
+    lv_obj_set_style_border_side(detail_container, LV_BORDER_SIDE_BOTTOM, 0); // 显示下边框
+    lv_obj_set_style_border_width(detail_container, 1, 0);
+    lv_obj_set_style_border_color(detail_container, lv_color_hex(0x000000), 0);
+    lv_obj_set_style_pad_all(detail_container, 20, 0);                  // 设置内边距
+    lv_obj_set_scrollbar_mode(detail_container, LV_SCROLLBAR_MODE_OFF); // 隐藏滚动条
+
+    // TODO: 设置字体加粗
+    lv_obj_t *detail_content_title = lv_label_create(detail_container);
+    lv_obj_set_size(detail_content_title, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_style_text_font(detail_content_title, font18.font, 0);
+    lv_label_set_text(detail_content_title, "转写内容");
+
+    lv_obj_t *detail_content_text = lv_label_create(detail_container);
+    lv_obj_set_size(detail_content_text, LV_PCT(100), LV_SIZE_CONTENT);
+    lv_obj_set_style_text_font(detail_content_text, font18.font, 0);
+    // lv_label_set_text(detail_content_text, "两代耳机的逻辑是一样的，就是盖子打开的时候就222会直接连接手机，开始把手机的，两代耳机的耳机cca逻辑是一样的，就是盖子打开的时候就会直接连接手机，开始把手机的，两代耳机的逻423辑是一样的，就是盖子，打开的时候就会直接连接手机，开始把手机的两代耳机的逻辑是一样的，就是盖子打开的时候就222会直接连接手机，开始把手机的，两代耳机的耳机cca逻辑是一样的，就是盖子打开的时候就会直接连接手机，开始把手机的，两代耳机的逻423辑是一样的，就是盖子，打开的时候就会直接连接手机，开始把手机的两代耳机的逻辑是一样的，就是盖子打开的时候就222会直接连接手机，开始把手机的，两代耳机的耳机cca逻辑是一样的，就是盖子打开的时候就会直接连接手机，开始把手机的，两代耳机的逻423辑是一样的，就是盖子，打开的时候就会直接连接手机，开始把手机的两代耳机的逻辑是一样的，就是盖子打开的时候就222会直接连接手机，开始把手机的，两代耳机的耳机cca逻辑是一样的，就是盖子打开的时候就会直接连接手机，开始把手机的，两代耳机的逻423辑是一样的，就是盖子，打开的时候就会直接连接手机，开始把手机的");
+    lv_label_set_text(detail_content_text, "");
+    lv_obj_set_pos(detail_content_text, 0, 35);
+
+    // 添加返回按钮
+    lv_obj_t *back_btn = create_back_btn(detail_box);
+    lv_obj_set_pos(back_btn, -2, 638);
+    // 添加按钮
+    lv_obj_t *btn_1 = lv_obj_create(detail_box);
+    lv_obj_remove_style_all(btn_1); // 清除默认样式
+    lv_obj_set_size(btn_1, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(btn_1, 160, 642);
+    // lv_obj_align(btn_1, LV_ALIGN_BOTTOM_LEFT, 175, -61);
+    lv_obj_set_layout(btn_1, LV_LAYOUT_FLEX);         // 使用Flex布局
+    lv_obj_set_flex_flow(btn_1, LV_FLEX_FLOW_COLUMN); // 垂直布局
+    lv_obj_set_flex_align(btn_1, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t *icon1 = lv_img_create(btn_1);
+    lv_img_set_src(icon1, "A:/data/images/AI/knowledge_icon.png");
+    lv_obj_t *label_1 = lv_label_create(btn_1);
+    lv_label_set_text(label_1, "添加到知识库");
+    lv_obj_set_style_text_font(label_1, font18.font, 0);
+
+    // 播放按钮
+    lv_obj_t *btn_2 = lv_obj_create(detail_box);
+    lv_obj_remove_style_all(btn_2); // 清除默认样式
+    lv_obj_set_size(btn_2, 110, LV_SIZE_CONTENT);
+    lv_obj_set_pos(btn_2, 300, 642);
+    // lv_obj_align(btn_2, LV_ALIGN_BOTTOM_LEFT, 325, -61);
+    lv_obj_set_layout(btn_2, LV_LAYOUT_FLEX);         // 使用Flex布局
+    lv_obj_set_flex_flow(btn_2, LV_FLEX_FLOW_COLUMN); // 垂直布局
+    lv_obj_set_flex_align(btn_2, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t *icon2 = lv_img_create(btn_2);
+    lv_img_set_src(icon2, "A:/data/images/AI/play_icon.png");
+    lv_obj_t *label_2 = lv_label_create(btn_2);
+    lv_label_set_text(label_2, "播放");
+    lv_obj_set_style_text_font(label_2, font18.font, 0);
+
+    lv_obj_add_event_cb(btn_1, click_knowledge_btn_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn_2, click_play_btn_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(back_btn, click_detail_back_btn_cb, LV_EVENT_CLICKED, NULL); // 添加返回按钮事件（消息详情页面）
 }
