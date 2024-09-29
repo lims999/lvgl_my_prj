@@ -33,7 +33,7 @@ typedef struct
 // 定义一个聊天列表数组
 chat_msg_t chat_list[MAX_MESSAGES] = {
     {SENDER_AI, "2024-07-21 10:04", "你好，我是AI助手，请问有什么可以帮到你？", "xxx1.mp3", "00:01"},
-    {SENDER_USER, NULL, NULL, "xxx2.mp3", "00:05", NULL},
+    {SENDER_USER, NULL, "请稍后。。。", "xxx2.mp3", "00:05", NULL},
     {SENDER_AI, "2024-07-22 11:04", "你好，我是AI助手，请问有什么可以帮到你？", "xxx3.mp3", "00:03", "6月23日 星期六 09:20-12:00"},
     {SENDER_USER, NULL, NULL, "xxx4.mp3", "00:06", NULL},
     {SENDER_AI, "2024-07-23 11:04", "你好，我是AI助手，请问有什么可以帮到你？", "xxx5.mp3", "00:03"},
@@ -48,15 +48,15 @@ int chat_count = 10; // 记录聊天消息的数量
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void click_back_btn_cb(lv_event_t *e);                                        // 返回按钮点击事件
-static void click_speech_btn_cb(lv_event_t *e);                                      // 语音输入按钮长按事件
-static void click_mute_btn_cb(lv_event_t *e);                                        // 静音按钮点击事件
-static void click_tip_btn_cb(lv_event_t *e);                                         // 联网、绑定按钮点击事件
-static void click_view_all_btn_cb(lv_event_t *e);                                    // 点击 查看完整内容 按钮
-static void add_msg(sender_type_t sender, const char *text, const char *voice_path); // 添加消息
-static void update_chat_list_ui(void);                                               // 更新聊天列表
-static void init_chat_ui(void);                                                      // 初始化聊天内容列表
-static void create_msg_detail(lv_obj_t *scr);                                        // 展示消息详情
+static void click_back_btn_cb(lv_event_t *e);                                                                                                                    // 返回按钮点击事件
+static void click_speech_btn_cb(lv_event_t *e);                                                                                                                  // 语音输入按钮长按事件
+static void click_mute_btn_cb(lv_event_t *e);                                                                                                                    // 静音按钮点击事件
+static void click_tip_btn_cb(lv_event_t *e);                                                                                                                     // 联网、绑定按钮点击事件
+static void click_view_all_btn_cb(lv_event_t *e);                                                                                                                // 点击 查看完整内容 按钮
+static void add_msg(sender_type_t sender, const char *detail_time, const char *text, const char *voice_path, const char *detail_duration, const char *schedule); // 添加消息
+static void update_chat_list_ui(void);                                                                                                                           // 更新聊天列表
+static void init_chat_ui(void);                                                                                                                                  // 初始化聊天内容列表
+static void create_msg_detail(lv_obj_t *scr);                                                                                                                    // 展示消息详情
 
 void toast_init(); // 初始化 toast
 void toast_show(); // 显示 toast
@@ -170,8 +170,7 @@ void *create_chat_page(void)
     lv_obj_set_pos(chat_container, 0, 106);
     lv_obj_set_layout(chat_container, LV_LAYOUT_FLEX);         // 使用 Flex 布局
     lv_obj_set_flex_flow(chat_container, LV_FLEX_FLOW_COLUMN); // 纵向布局
-
-    lv_obj_set_style_border_width(chat_container, 0, 0); // 调试
+    lv_obj_set_style_border_width(chat_container, 0, 0);
     lv_obj_set_style_border_color(chat_container, lv_color_hex(0x0000ff), 0);
 
     // 调整 聊天内容容器顶部 padding
@@ -210,9 +209,6 @@ void *create_chat_page(void)
     lv_obj_set_style_text_color(topTipText, lv_color_hex(0xffffff), 0);
     lv_obj_set_style_text_font(topTipText, font18.font, 0);
 
-    lv_obj_set_style_border_width(topTipText, 1, 0); // 调试
-    lv_obj_set_style_border_color(topTipText, lv_color_hex(0xff0000), 0);
-
     // 操作按钮
     lv_obj_t *topTipBtn = lv_obj_create(topTip);
     lv_obj_set_size(topTipBtn, 100, 56);
@@ -220,9 +216,7 @@ void *create_chat_page(void)
     lv_obj_set_layout(topTipBtn, LV_LAYOUT_FLEX);      // 使用Flex布局
     lv_obj_set_flex_flow(topTipBtn, LV_FLEX_FLOW_ROW); // 横向布局
     lv_obj_set_flex_align(topTipBtn, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_set_style_border_width(topTipBtn, 1, 0); // 调试
-    lv_obj_set_style_border_color(topTipBtn, lv_color_hex(0xff0000), 0);
+    lv_obj_set_style_border_width(topTipBtn, 0, 0);
 
     // 操作按钮文字
     lv_obj_t *topTipBtnText = lv_label_create(topTipBtn);
@@ -422,16 +416,16 @@ static void init_chat_ui(void)
     // 添加AI欢迎词
     if (!is_online)
     {
-        add_msg(SENDER_AI, "你好我是Palmi，你的AI助手。当前未联网,联网后您可以问我问题，或者让我帮您定制日程，记录知识。", NULL);
+        add_msg(SENDER_AI, "current_time", "你好我是Palmi，你的AI助手。当前未联网,联网后您可以问我问题，或者让我帮您定制日程，记录知识。", NULL, "detail_duration", NULL);
     }
     else
     {
-        add_msg(SENDER_AI, "你好我是你的AI助手。您可以问我问题，或者让我帮您定制日程，记录知识。", NULL);
+        add_msg(SENDER_AI, "current_time", "你好我是你的AI助手。您可以问我问题，或者让我帮您定制日程，记录知识。", NULL, "detail_duration", NULL);
     }
 }
 
 // 添加消息
-static void add_msg(sender_type_t sender, const char *text, const char *voice_path)
+static void add_msg(sender_type_t sender, const char *detail_time, const char *text, const char *voice_path, const char *detail_duration, const char *schedule)
 {
     if (chat_count >= MAX_MESSAGES)
     {
@@ -439,9 +433,12 @@ static void add_msg(sender_type_t sender, const char *text, const char *voice_pa
         return;
     }
 
-    chat_list[chat_count].sender = sender;                 // 设置发送者（类型）
-    chat_list[chat_count].text = strdup(text);             // 复制消息文本
-    chat_list[chat_count].voice_path = strdup(voice_path); // 复制语音路径
+    chat_list[chat_count].sender = sender;                           // 设置发送者（类型）
+    chat_list[chat_count].detail_time = strdup(detail_time);         // 复制记录时间
+    chat_list[chat_count].text = strdup(text);                       // 复制消息文本
+    chat_list[chat_count].voice_path = strdup(voice_path);           // 复制语音路径
+    chat_list[chat_count].detail_duration = strdup(detail_duration); // 复制语音时长
+    chat_list[chat_count].schedule = strdup(schedule);               // 复制日程日程内容
 
     chat_count++;
     update_chat_list_ui();
@@ -467,9 +464,28 @@ static void update_chat_list_ui(void)
             lv_obj_set_flex_align(msg_container, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER); // 将内容右对齐
             lv_obj_set_style_border_width(msg_container, 0, 0);
 
-            // 用户发送的消息（语音）
-            // lv_label_set_text(msg_text, chat_list[i].text);
-            lv_obj_t *voice_msg_btn = create_btn_img(msg_container, "A:/data/images/AI/voice_msg.png");
+            lv_obj_t *voice_msg_btn; // 用户发送的消息（语音/请稍后。。。）
+            // 创建用户的聊天消息子容器
+            if (chat_list[i].text)
+            {
+                lv_obj_t *voice_msg_box = lv_obj_create(msg_container);
+                lv_obj_set_size(voice_msg_box, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+                lv_obj_set_style_bg_color(voice_msg_box, lv_color_hex(0x000000), 0);
+                lv_obj_set_style_radius(voice_msg_box, 20, 0);
+                lv_obj_set_style_border_width(voice_msg_box, 0, 0);
+
+                voice_msg_btn = lv_label_create(voice_msg_box);
+                lv_obj_set_size(voice_msg_btn, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+                lv_obj_set_style_text_font(voice_msg_btn, font18.font, 0);
+                lv_obj_set_style_text_color(voice_msg_btn, lv_color_hex(0xffffff), 0);
+
+                // AI 回复的消息（语音 + 文本 + 操作选项）
+                lv_label_set_text(voice_msg_btn, "请稍后。。。"); // 显示 AI 回复的文本内容
+            }
+            else
+            {
+                voice_msg_btn = create_btn_img(msg_container, "A:/data/images/AI/voice_msg.png");
+            }
 
             lv_obj_add_event_cb(voice_msg_btn, click_play_btn_cb, LV_EVENT_CLICKED, chat_list[i].voice_path); // 添加播放按钮事件
         }
@@ -489,9 +505,6 @@ static void update_chat_list_ui(void)
             lv_obj_t *msg_text = lv_label_create(msg_container);
             lv_obj_set_size(msg_text, LV_PCT(100), LV_SIZE_CONTENT);
             lv_obj_set_style_text_font(msg_text, font18.font, 0);
-
-            lv_obj_set_style_border_width(msg_text, 1, 0); // 调试
-            lv_obj_set_style_border_color(msg_text, lv_color_hex(0xff0000), 0);
 
             lv_label_set_long_mode(msg_text, LV_LABEL_LONG_DOT); // 超出部分显示"..."
             lv_obj_set_style_max_height(msg_text, 168, 0);       // 限制高度（根据 UED 6行文本高度为 168）
@@ -517,16 +530,11 @@ static void update_chat_list_ui(void)
                 {
                     lv_obj_t *image = lv_img_create(msg_btns_box);
                     lv_img_set_src(image, "A:/data/images/AI/schedule_icon.png");
-                    lv_obj_set_style_border_width(image, 1, 0); // 调试
-                    lv_obj_set_style_border_color(image, lv_color_hex(0x000000), 0);
 
                     // 日程文本
                     lv_obj_t *schedule_text = lv_label_create(msg_btns_box);
                     // lv_obj_set_size(schedule_text, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     lv_obj_set_style_text_font(schedule_text, font18.font, 0);
-
-                    lv_obj_set_style_border_width(schedule_text, 1, 0); // 调试
-                    lv_obj_set_style_border_color(schedule_text, lv_color_hex(0xff0000), 0);
 
                     // 设置日程文本
                     lv_label_set_text(schedule_text, chat_list[i].schedule);
